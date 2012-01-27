@@ -5,11 +5,19 @@
 //
 // Please retain this copyright header in all versions of the software
 //////////////////////////////////////////////////////////////////////////////////
-(function ($) {
 
-    $(document).ready(function () {
-        $('.cloud-zoom, .cloud-zoom-gallery').CloudZoom();
-    });
+//////////////////////////////////////////////////////////////////////////////////
+//
+//SETTINGS:
+//
+//to start, include this code in header on you site\page.
+//
+//    $(document).ready(function () {
+//        $('.cloud-zoom, .cloud-zoom-gallery').CloudZoom();
+//    });
+//
+
+(function ($) {
 
     function format(str) {
         for (var i = 1; i < arguments.length; i++) {
