@@ -14,9 +14,9 @@
     var last = scripts[scripts.length-1].src.lastIndexOf('/');
     var scriptPath = scripts[scripts.length-1].src.slice(0,last);
         
-    $(document).ready(function () {
-        $('.cloud-zoom, .cloud-zoom-gallery').CloudZoom();
-    });
+   // $(document).ready(function () {
+   //     $('.cloud-zoom, .cloud-zoom-gallery').CloudZoom();
+   // });
 
     function format(str) {
         for (var i = 1; i < arguments.length; i++) {
