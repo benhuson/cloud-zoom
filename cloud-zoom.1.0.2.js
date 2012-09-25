@@ -1,12 +1,19 @@
 //////////////////////////////////////////////////////////////////////////////////
-// Cloud Zoom V1.0.2
-// (c) 2010 by R Cecco. <http://www.professorcloud.com>
+// Cloud Zoom V1.0.3
+// Rev 201209181857
+// (c) 2010-2012 by R Cecco. <http://www.professorcloud.com>
 // MIT License
 //
 // Please retain this copyright header in all versions of the software
 //////////////////////////////////////////////////////////////////////////////////
 (function ($) {
 
+   
+    // Get the path of executing script.
+    var scripts = document.getElementsByTagName("script");
+    var last = scripts[scripts.length-1].src.lastIndexOf('/');
+    var scriptPath = scripts[scripts.length-1].src.slice(0,last);
+        
     $(document).ready(function () {
         $('.cloud-zoom, .cloud-zoom-gallery').CloudZoom();
     });
@@ -44,10 +51,10 @@
         // images load really fast, e.g. from the cache. 
         //var	ctx = this;
         setTimeout(function () {
-            //						 <img src="/images/loading.gif"/>
             if ($mouseTrap === null) {
                 var w = jWin.width();
-                jWin.parent().append(format('<div style="width:%0px;position:absolute;top:75%;left:%1px;text-align:center" class="cloud-zoom-loading" >Loading...</div>', w / 3, (w / 2) - (w / 6))).find(':last').css('opacity', 0.5);
+                jWin.parent().append(format('<div style="width:%0px;position:absolute;top:75%;left:%1px;text-align:center" class="cloud-zoom-loading" >Loading...</div>', w / 3, (w / 2) - (w / 6)));
+                $('cloud-zoom-loading', jWin.parent()).css('opacity', 0.5)
             }
         }, 200);
 
@@ -170,8 +177,18 @@
 		We need the dummy background image as IE does not trap mouse events on
 		transparent parts of a div.
 		*/
-            $mouseTrap = jWin.parent().append(format("<div class='mousetrap' style='background-image:url(\".\");z-index:999;position:absolute;width:%0px;height:%1px;left:%2px;top:%3px;\'></div>", sImg.outerWidth(), sImg.outerHeight(), 0, 0)).find(':last');
+            var $m = $("<div class='mousetrap' style='background-image:url(\"" + scriptPath + "/blank.png\")" + "\'></div>");
 
+            $mouseTrap = jWin.parent().append($m).find(':last');
+            $mouseTrap = $('.mousetrap',jWin.parent());
+            $mouseTrap.css({
+                width:sImg.outerWidth(),
+                height:sImg.outerHeight(),
+                top:0,
+                left:0,
+                position:'absolute',
+                zIndex:9999
+            });
             //////////////////////////////////////////////////////////////////////			
             /* Do as little as possible in mousemove event to prevent slowdown. */
             $mouseTrap.bind('mousemove', this, function (event) {
@@ -250,9 +267,11 @@
 
                 zoomDiv = appendTo.append(format('<div id="cloud-zoom-big" class="cloud-zoom-big" style="display:none;position:absolute;left:%0px;top:%1px;width:%2px;height:%3px;background-image:url(\'%4\');z-index:99;"></div>', xPos, yPos, w, h, zoomImage.src)).find(':last');
 
+                zoomDiv = $('.cloud-zoom-big',appendTo);
                 // Add the title from title tag.
                 if (sImg.attr('title') && opts.showTitle) {
-                    zoomDiv.append(format('<div class="cloud-zoom-title">%0</div>', sImg.attr('title'))).find(':last').css('opacity', opts.titleOpacity);
+                    zoomDiv.append(format('<div class="cloud-zoom-title">%0</div>', sImg.attr('title'))); 
+                    $('.cloud-zoom-title', zoomDiv).css('opacity', opts.titleOpacity);
                 }
 
                 // Fix ie6 select elements wrong z-index bug. Placing an iFrame over the select element solves the issue...		
@@ -278,7 +297,7 @@
 
                 // Attach mouse, initially invisible to prevent first frame glitch
                 lens = jWin.append(format("<div class = 'cloud-zoom-lens' style='display:none;z-index:98;position:absolute;width:%0px;height:%1px;'></div>", cw, ch)).find(':last');
-
+                lens = $('.cloud-zoom-lens',jWin);
                 $mouseTrap.css('cursor', lens.css('cursor'));
 
                 var noTrans = false;
@@ -286,7 +305,9 @@
                 // Init tint layer if needed. (Not relevant if using inside mode)			
                 if (opts.tint) {
                     lens.css('background', 'url("' + sImg.attr('src') + '")');
-                    $tint = jWin.append(format('<div style="display:none;position:absolute; left:0px; top:0px; width:%0px; height:%1px; background-color:%2;" />', sImg.outerWidth(), sImg.outerHeight(), opts.tint)).find(':last');
+                    $tint = jWin.append(format('<div class="cloud-zoom-tint" style="display:none;position:absolute; left:0px; top:0px; width:%0px; height:%1px; background-color:%2;" />', sImg.outerWidth(), sImg.outerHeight(), opts.tint)).find(':last');
+                    $tint = $('.cloud-zoom-tint',jWin);
+                    
                     $tint.css('opacity', opts.tintOpacity);                    
 					noTrans = true;
 					$tint.fadeIn(500);
@@ -294,7 +315,8 @@
                 }
                 if (opts.softFocus) {
                     lens.css('background', 'url("' + sImg.attr('src') + '")');
-                    softFocus = jWin.append(format('<div style="position:absolute;display:none;top:2px; left:2px; width:%0px; height:%1px;" />', sImg.outerWidth() - 2, sImg.outerHeight() - 2, opts.tint)).find(':last');
+                    jWin.append(format('<div class="cloud-zoom-soft" style="position:absolute;display:none;top:2px; left:2px; width:%0px; height:%1px;" />', sImg.outerWidth() - 2, sImg.outerHeight() - 2, opts.tint));
+                    softFocus = $('.cloud-zoom-soft',jWin);
                     softFocus.css('background', 'url("' + sImg.attr('src') + '")');
                     softFocus.css('opacity', 0.5);
                     noTrans = true;
@@ -304,7 +326,9 @@
                 if (!noTrans) {
                     lens.css('opacity', opts.lensOpacity);										
                 }
-				if ( opts.position !== 'inside' ) { lens.fadeIn(500); }
+                if ( opts.position !== 'inside' ) {
+                    lens.fadeIn(500);
+                }
 
                 // Start processing. 
                 zw.controlLoop();
